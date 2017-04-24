@@ -78,7 +78,7 @@ public: Board(int dim, Ship ships[], int player) {
 
 	// note: check no ships are overlapping
 	MessageBox::Show("before for");
-	for (int i = 0; i < sizeof(ships) / sizeof(ships[0]); i++) // for loop not working ffs - how to loop over array in cpp
+	for (int i = 0; i < sizeof(ships)/sizeof(&ships); i++) // for loop working? ffs - how to loop over array in cpp
 	{
 		MessageBox::Show("in for");
 		board[ships[i].xCoord][ships[i].yCoord]->shipPresent = true;
@@ -139,7 +139,7 @@ void Main(array<String^, 1>^ args)
 {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
-	Ship shipArr[1] = { Ship(1,3,1,1,4) };
+	Ship shipArr[1] = { Ship(3,1,1,1,4) };
 	player1Board = new Board(10, shipArr, 1);
 
 	CppWinForm1::MyForm form;
