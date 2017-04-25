@@ -1,137 +1,46 @@
 #include "MyForm.h"
+#ifndef INCLUDED_IOS
+#define INCLUDED_IOS
 #include <iostream>
+#endif
 #include <fstream>
+#ifndef INCLUDED_MARSHAL
+#define INCLUDED_MARSHAL
 #include "msclr\marshal_cppstd.h"
+#endif
+#include "Board.cpp"
 
 using namespace System;
 using namespace System::Windows::Forms;
 //using namespace std; // don't uncomment, causes problems
 
-const int MAX_BOARD_SIZE = 20;
-bool somethingWentWrong = false;
+// variable declarations
+
 int player1HP = 0;
 int player2HP = 0;
-void update(Control^ control, int x, int y, int player);
-
-
-
-
-class Ship {
-public: short length; // length of ship, how far it goes from point of origin
-		short width; // width of ship, does it bleed into adjacent spaces, only 1 allowed so far
-		short xCoord; // point of origin
-		short yCoord; // point of origin
-		short orientation; // 1 = west, 2 = north, 3 = east, 4 = south. If a ship has width>1, even widths will protrude east/south
-		short hp; // how many hits left to sunk. by default initialized to width*length
-
-		Ship(short l, short w, short x, short y, short or ) {
-			length = l;
-			if (w != 1) { std::cout << "width is only allowed to be 1" << std::endl; }
-			width = 1;
-			xCoord = x;
-			yCoord = y;
-			orientation = or ;
-			hp = length * width;
-		}
-};
-struct Space {
-	bool revealed; // revealed upon the opponent guessing this space
-	bool shipPresent; // ship is present in this tile
-	Ship* ship;
-};
-class Board {
-public:
-	int dimension;
-	int player; // 1 == player1, 2 == player2
-	Space* getSpace(int x, int y) {
-		if (x < dimension && y < dimension) {
-			return board[x][y];
-		}
-		return NULL;
-	}
-	void setSpace(int x, int y, bool reveal, bool present, Ship* s) { // **************************************************** Made this
-		if (x < dimension && y < dimension) {
-			board[x][y]->revealed = reveal;
-			board[x][y]->shipPresent = present;
-			board[x][y]->ship = s;
-		}
-	}
-private: Space* board[MAX_BOARD_SIZE][MAX_BOARD_SIZE]; // top left = (0,0)
-
-public: Board(int dim, Ship ships[], int player) {
-	if (dim > MAX_BOARD_SIZE) exit(-1); // invalid dim
-	dimension = dim;
-	this->player = player;
-	for (int i = 0; i < dimension; i++)
-	{
-		for (int j = 0; j < dimension; j++)
-		{
-			board[i][j] = new Space;
-			board[i][j]->revealed = false;
-			board[i][j]->shipPresent = false;
-			if (this->player == 1) {
-
-			}
-
-		}
-	}
-
-	// note: check no ships are overlapping
-	MessageBox::Show("before for");
-	for (int i = 0; i < sizeof(ships)/sizeof(&ships); i++) // for loop working? ffs - how to loop over array in cpp
-	{
-		MessageBox::Show("in for");
-		board[ships[i].xCoord][ships[i].yCoord]->shipPresent = true;
-		board[ships[i].xCoord][ships[i].yCoord]->ship = &ships[i];
-		if (ships[i].length > 1) {
-			switch (ships[i].orientation) {
-			case 1: // west
-
-				for (int k = 1; k < ships[i].length; k++)
-				{
-					if (board[ships[i].xCoord - k][ships[i].yCoord]->shipPresent == true)somethingWentWrong = true; // if a ship is already here, overlapping ships!
-					board[ships[i].xCoord - k][ships[i].yCoord]->shipPresent = true;
-					board[ships[i].xCoord - k][ships[i].yCoord]->ship = &ships[i];
-				}
-
-				break;
-			case 2: // north
-				for (int k = 1; k < ships[i].length; k++)
-				{
-					if (board[ships[i].xCoord][ships[i].yCoord - k]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord][ships[i].yCoord - k]->shipPresent = true;
-					board[ships[i].xCoord][ships[i].yCoord - k]->ship = &ships[i];
-				}
-				break;
-			case 3: // east
-				for (int k = 1; k < ships[i].length; k++)
-				{
-					if (board[ships[i].xCoord + k][ships[i].yCoord]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord + k][ships[i].yCoord]->shipPresent = true;
-					board[ships[i].xCoord + k][ships[i].yCoord]->ship = &ships[i];
-				}
-				break;
-			case 4: // south
-				for (int k = 1; k < ships[i].length; k++)
-				{
-					if (board[ships[i].xCoord][ships[i].yCoord + k]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord][ships[i].yCoord + k]->shipPresent = true;
-					board[ships[i].xCoord][ships[i].yCoord + k]->ship = &ships[i];
-					MessageBox::Show("placing that ship");
-				}
-				break;
-			default:
-				MessageBox::Show("you shouldn't be here");
-			}
-		}
-	}
-
-}
-
-
-};
-
 Board* player1Board;
+bool player1isHuman;
+bool player2isHuman;
+bool showPlayer1Console;
+bool showPlayer2Console;
+int timeLimit; // in seconds
+
+
+
+// function declarations
+void update(Control^ control, int x, int y, int player); // does a move
+void illegalMove(int player); // player made an illegal move
+void endGame(int winner); // player winner wins game
+bool checkMoveLegality(int x,int y, Board* player1Board); // checks legality of move, true if legal, false if illegal
+void buttonClicked(Control^ control, int x, int y, int player); // does actions after a move is manually input
+
+
+
+
+
+
+
+
 
 
 [STAThread]
@@ -187,14 +96,31 @@ int getYFromCoordString(String^ coordString) {
 void update(Control^ control, int x, int y, int player) {
 	if (x < player1Board->dimension && y < player1Board->dimension) {
 		if (player == 1) {
+			// check for legality
+			if (checkMoveLegality(x,y, player1Board) == false) illegalMove(1);
+			
 			player1Board->getSpace(x, y)->revealed = true;
 			if (player1Board->getSpace(x, y)->shipPresent) {
 				// hit
+				
 					// display hit
 				control->BackColor = System::Drawing::Color::Red;
 				// handle hit
 					// decrement ship hp
+				int shipRemainingHP = player1Board->getSpace(x, y)->ship->hit(x, y); // returns remaining hp
+					// decrement player hp
+				player1HP = player1HP - 1;
+				
+				//array<Control ^, 1>^ player1HPLabelarr = control->Parent->Parent->player1HPLabel->Text = "Total Ship HP Remaining:  " + player1HP;
+				//Label ^ player1HPLabel = dynamic_cast<Label^>(player1HPLabelarr[0]);
+				//player1HPLabel->Text = 
 					// check for sunk
+				if (shipRemainingHP == 0) { // sunk
+					
+				}
+				else {
+
+				}
 						// check for endgame
 			}
 			else {
@@ -213,18 +139,34 @@ void update(Control^ control, int x, int y, int player) {
 }
 
 void initialize() {
+	//Ship ships1[];  // ********************************************************************************************* QUESTION HOW SHOULD I DECLARE MY SHIPS?
+	//Ship ships2[];
+	//int dimension;
+	//Board *b1 = new Board(dimension, ships1);
+	//Board *b2 = new Board(dimension, ships2);
+
 	// get path for config file or user settings
 	// size of board
 	// number/ type of ships
 
 
 	// get path for placement file or player 1 placement (call player 1 exe in placement mode?)
-	// check ships don't go out of bounds
 
-	//Board playerOneBoard = new Board(, );
+
+	// check for out of bounds ships
+	//for (int i = 0; i < sizeof(ships1) / sizeof(ships1[0]); i++) {
+	//	checkLocation(ships1[i], *b1);  // ****************************************************************** May want to change this to board pointer in function call
+	//}
+
 
 	// get path for placement file or player 2 placement (call player 2 exe in placement mode?)
+
+
+
 	// check for out of bounds ships
+	//for (int i = 0; i < sizeof(ships2) / sizeof(ships2[0]); i++) {
+	//	checkLocation(ships2[i], *b2);  // ****************************************************************** May want to change this to board pointer in function call
+	//}
 
 	//Board playerTwoBoard = new Board( , );
 
@@ -234,28 +176,41 @@ void initialize() {
 
 }
 
-void play() {
-	//do
-	// call player1 exe
+void play(Board b1, Board b2, Ship player1Ships[], Ship player2Ships[]) {
+	//int x; // x coordinate
+	//int y; // y coordinate
+	//do {
+	//	// call player1 exe
 
-	// get player1 move
+	//	// get player1 move
+	//	//x = getX();
+	//	//y = getY();
 
-	// check for legality
+	//	// check for legality
+	//	// play move, reveal space, apply hp (if hit)
+	//	doMove(x, y, b1);      // *************************** returns true if move was valid.
 
-	// play move, reveal space, apply hp (if hit)
+	//						   // check for endgame condition
+	//	if (isGameOver(player1Ships)) {
+	//		endGame();
+	//	}
 
-	// check for endgame condition
 
-	// call player2 exe
+	//	// call player2 exe
 
-	// get player2 move
+	//	// get player2 move
+	//	//x = getX();
+	//	//y = getY();
 
-	// check for legality
+	//	// check for legality
+	//	// play move, reveal space, apply hp (if hit)
+	//	doMove(x, y, b2);
 
-	// play move, reveal space, apply hp (if hit)
-
-	// check for endgame condition
-	//while(true)
+	//	// check for endgame condition
+	//	if (isGameOver(player2Ships)) {
+	//		endGame();
+	//	}
+	//} while (true);
 }
 
 void callEXE() {}
@@ -285,13 +240,24 @@ void setShip(Ship s, Board b) {
 		}
 	}
 }
-void getMove() {}
+array<int^,1>^ readMove() {
+	// read move.txt
+	array<int^, 1>^ move;
+	return move;
+}
 
-bool checkMove(int x, int y, Board b) {
+bool checkMoveLegality(int x, int y, Board* b) {
+	if (b->getSpace(x, y)->revealed == true) return false; // move has already been made, illegal
+	//MessageBox::Show("legal move");
 	return true;
 }
 
-void updateGUI() {}
+// player made illegal move
+void illegalMove(int player) {
+	MessageBox::Show("Player " + player + " made a bad move" );
+	if (player == 1) endGame(2);
+	endGame(1);
+}
 
 
 // this function will check to make sure that the placement
@@ -377,21 +343,21 @@ bool checkLocation(Ship s, Board b) {
 	return valid;
 }
 
-// simple game function to take care of a single move
-bool doMove(int x, int y, Board b) {
-	Space* sp = b.getSpace(x, y);
-	if (sp->revealed == false) {  // is it a valid move?
-		if (sp->shipPresent) {    // is there a ship there?
-			sp->ship->hp--;       // decrement hp
-		}
-		sp->revealed = true;      // to show it has been guessed already
-		return true;
-	}
-	else {
-		return false;
-	}
-	updateGUI();
-}
+//// simple game function to take care of a single move
+//bool doMove(int x, int y, Board b) {
+//	Space* sp = b.getSpace(x, y);
+//	if (sp->revealed == false) {  // is it a valid move?
+//		if (sp->shipPresent) {    // is there a ship there?
+//			sp->ship->hp--;       // decrement hp
+//		}
+//		sp->revealed = true;      // to show it has been guessed already
+//		return true;
+//	}
+//	else {
+//		return false;
+//	}
+//	updateGUI();
+//}
 
 // simple function to determine if someone won.  It looks at the hp of each ship.
 bool isGameOver(Ship ships[]) {
@@ -403,7 +369,8 @@ bool isGameOver(Ship ships[]) {
 	}
 	return over;
 }
-void endGame() {
+
+void endGame(int winner) {
 
 }
 
@@ -417,7 +384,7 @@ System::Void CppWinForm1::MyForm::player1Button_Click(System::Object ^ sender, S
 		int x = getXFromCoordString(coordString);
 		int y = getYFromCoordString(coordString);
 
-
+		player1HPLabel->Text = "hi"; // works !!
 
 		buttonClicked(senderControl, x, y, 1);
 	}
@@ -434,3 +401,59 @@ System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, S
 
 	buttonClicked(senderControl, x, y, 2);
 }
+
+System::Void CppWinForm1::MyForm::player1HumanButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::player1PCButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::player1ConsoleCheckbox_CheckedChanged(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::player2HumanButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::player2PCButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::player2ConsoleCheckbox_CheckedChanged(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::placeButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::showShipsCheckbox_CheckedChanged(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::playButton_Click(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
+System::Void CppWinForm1::MyForm::timeLimitComboBox_SelectedIndexChanged(System::Object ^ sender, System::EventArgs ^ e)
+{
+	return System::Void();
+}
+
