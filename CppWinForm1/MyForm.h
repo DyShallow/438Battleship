@@ -65,6 +65,8 @@ namespace CppWinForm1 {
 	public: System::Windows::Forms::Button^  resetButton;
 	public: System::Windows::Forms::GroupBox^  player1Box;
 	public: System::Windows::Forms::Label^  player1HPLabel;
+	private: System::Windows::Forms::Label^  player1BoardLabel;
+	private: System::Windows::Forms::Label^  player2BoardLabel;
 
 	public: System::Windows::Forms::CheckBox^  player1ConsoleCheckbox;
 	public: System::Windows::Forms::Label^  player1Label;
@@ -132,6 +134,8 @@ namespace CppWinForm1 {
 			this->player2LastMoveLabel = (gcnew System::Windows::Forms::Label());
 			this->timeLimitLabel = (gcnew System::Windows::Forms::Label());
 			this->timeLimitComboBox = (gcnew System::Windows::Forms::ComboBox());
+			this->player1BoardLabel = (gcnew System::Windows::Forms::Label());
+			this->player2BoardLabel = (gcnew System::Windows::Forms::Label());
 			this->controlPanel->SuspendLayout();
 			this->player1Box->SuspendLayout();
 			this->controlBox->SuspendLayout();
@@ -487,6 +491,28 @@ namespace CppWinForm1 {
 			this->timeLimitComboBox->SelectedIndexChanged += gcnew System::EventHandler(this, &MyForm::timeLimitComboBox_SelectedIndexChanged);
 
 			// 
+			// player1BoardLabel
+			// 
+			this->player1BoardLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 13, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->player1BoardLabel->Location = System::Drawing::Point(270, 5);
+			this->player1BoardLabel->Name = L"player1BoardLabel";
+			this->player1BoardLabel->Size = System::Drawing::Size(312, 29);
+			this->player1BoardLabel->TabIndex = 2;
+			this->player1BoardLabel->Text = L"Player 1\'s Board (Player 2 play here)";
+
+			// 
+			// player2BoardLabel
+			// 
+			this->player2BoardLabel->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 13, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->player2BoardLabel->Location = System::Drawing::Point(803, 5);
+			this->player2BoardLabel->Name = L"player2BoardLabel";
+			this->player2BoardLabel->Size = System::Drawing::Size(312, 29);
+			this->player2BoardLabel->TabIndex = 2;
+			this->player2BoardLabel->Text = L"Player 2\'s Board (Player 1 play here)";
+
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -495,7 +521,8 @@ namespace CppWinForm1 {
 			this->Controls->Add(this->player1Panel);
 			this->Controls->Add(this->player2Panel);
 			this->Controls->Add(this->controlPanel);
-
+			this->Controls->Add(this->player1BoardLabel);
+			this->Controls->Add(this->player2BoardLabel);
 			this->Controls->Add(this->verticalLabel);
 			this->Controls->Add(this->horizontalLabel);
 			this->Controls->Add(this->horizontalLabel2);
@@ -529,6 +556,7 @@ namespace CppWinForm1 {
 	private: System::Void resetButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void placeButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void showShipsCheckbox_CheckedChanged(System::Object^  sender, System::EventArgs^  e);
+			 void loopThroughTurns();
 	private: System::Void playButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void timeLimitComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e);
 	};
