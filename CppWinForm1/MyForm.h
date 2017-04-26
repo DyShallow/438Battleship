@@ -224,6 +224,9 @@ namespace CppWinForm1 {
 					this->player1Buttons[i, j]->Click += gcnew System::EventHandler(this, &MyForm::player1Button_Click); // add event listeners
 					this->player2Buttons[i, j]->Click += gcnew System::EventHandler(this, &MyForm::player2Button_Click);
 
+					this->player1Buttons[i, j]->Enabled = false;
+					this->player2Buttons[i, j]->Enabled = false;
+
 				}
 			}
 

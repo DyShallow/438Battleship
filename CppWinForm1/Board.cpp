@@ -17,9 +17,12 @@ struct Space {
 class Board {
 public:
 	const static int MAX_BOARD_SIZE = 20;
+	const static int MAX_SHIP_COUNT = 20;
 	bool somethingWentWrong = false;
 	int dimension;
+	int numberOfShips;
 	int player; // 1 == player1, 2 == player2
+	int totalHP = 0;
 	Space* getSpace(int x, int y) {
 		if (x < dimension && y < dimension) {
 			return board[x][y];
@@ -35,9 +38,10 @@ public:
 	}
 private: Space* board[MAX_BOARD_SIZE][MAX_BOARD_SIZE]; // top left = (0,0)
 
-public: Board(int dim, Ship ships[], int player) {
+public: Board(int dim, Ship* ships[], int player, int numberOfShips) {
 	if (dim > MAX_BOARD_SIZE) exit(-1); // invalid dim
 	dimension = dim;
+	this->numberOfShips = numberOfShips;
 	this->player = player;
 	for (int i = 0; i < dimension; i++)
 	{
@@ -55,45 +59,46 @@ public: Board(int dim, Ship ships[], int player) {
 
 	// note: check no ships are overlapping
 	//System::Windows::Forms::MessageBox::Show("before for");
-	for (int i = 0; i < sizeof(ships) / sizeof(&ships); i++) // for loop working? ffs - how to loop over array in cpp
+	for (int i = 0; i < numberOfShips; i++) // for loop working? ffs - how to loop over array in cpp
 	{
+		totalHP += ships[i]->hp;
 		//System::Windows::Forms::MessageBox::Show("in for");
-		board[ships[i].xCoord][ships[i].yCoord]->shipPresent = true;
-		board[ships[i].xCoord][ships[i].yCoord]->ship = &ships[i];
-		if (ships[i].length > 1) {
-			switch (ships[i].orientation) {
+		board[ships[i]->xCoord][ships[i]->yCoord]->shipPresent = true;
+		board[ships[i]->xCoord][ships[i]->yCoord]->ship = ships[i];
+		if (ships[i]->length > 1) {
+			switch (ships[i]->orientation) {
 			case 1: // west
 
-				for (int k = 1; k < ships[i].length; k++)
+				for (int k = 1; k < ships[i]->length; k++)
 				{
-					if (board[ships[i].xCoord - k][ships[i].yCoord]->shipPresent == true)somethingWentWrong = true; // if a ship is already here, overlapping ships!
-					board[ships[i].xCoord - k][ships[i].yCoord]->shipPresent = true;
-					board[ships[i].xCoord - k][ships[i].yCoord]->ship = &ships[i];
+					if (board[ships[i]->xCoord - k][ships[i]->yCoord]->shipPresent == true)somethingWentWrong = true; // if a ship is already here, overlapping ships!
+					board[ships[i]->xCoord - k][ships[i]->yCoord]->shipPresent = true;
+					board[ships[i]->xCoord - k][ships[i]->yCoord]->ship = ships[i];
 				}
 
 				break;
 			case 2: // north
-				for (int k = 1; k < ships[i].length; k++)
+				for (int k = 1; k < ships[i]->length; k++)
 				{
-					if (board[ships[i].xCoord][ships[i].yCoord - k]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord][ships[i].yCoord - k]->shipPresent = true;
-					board[ships[i].xCoord][ships[i].yCoord - k]->ship = &ships[i];
+					if (board[ships[i]->xCoord][ships[i]->yCoord - k]->shipPresent == true)somethingWentWrong = true;
+					board[ships[i]->xCoord][ships[i]->yCoord - k]->shipPresent = true;
+					board[ships[i]->xCoord][ships[i]->yCoord - k]->ship = ships[i];
 				}
 				break;
 			case 3: // east
-				for (int k = 1; k < ships[i].length; k++)
+				for (int k = 1; k < ships[i]->length; k++)
 				{
-					if (board[ships[i].xCoord + k][ships[i].yCoord]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord + k][ships[i].yCoord]->shipPresent = true;
-					board[ships[i].xCoord + k][ships[i].yCoord]->ship = &ships[i];
+					if (board[ships[i]->xCoord + k][ships[i]->yCoord]->shipPresent == true)somethingWentWrong = true;
+					board[ships[i]->xCoord + k][ships[i]->yCoord]->shipPresent = true;
+					board[ships[i]->xCoord + k][ships[i]->yCoord]->ship = ships[i];
 				}
 				break;
 			case 4: // south
-				for (int k = 1; k < ships[i].length; k++)
+				for (int k = 1; k < ships[i]->length; k++)
 				{
-					if (board[ships[i].xCoord][ships[i].yCoord + k]->shipPresent == true)somethingWentWrong = true;
-					board[ships[i].xCoord][ships[i].yCoord + k]->shipPresent = true;
-					board[ships[i].xCoord][ships[i].yCoord + k]->ship = &ships[i];
+					if (board[ships[i]->xCoord][ships[i]->yCoord + k]->shipPresent == true)somethingWentWrong = true;
+					board[ships[i]->xCoord][ships[i]->yCoord + k]->shipPresent = true;
+					board[ships[i]->xCoord][ships[i]->yCoord + k]->ship = ships[i];
 					//System::Windows::Forms::MessageBox::Show("placing that ship");
 				}
 				break;
