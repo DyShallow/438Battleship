@@ -556,6 +556,8 @@ namespace CppWinForm1 {
 	private: System::Void resetButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void placeButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void showShipsCheckbox_CheckedChanged(System::Object^  sender, System::EventArgs^  e);
+	/*		 void player1Turn();
+			 void player2Turn();*/
 			 void loopThroughTurns();
 	private: System::Void playButton_Click(System::Object^  sender, System::EventArgs^  e);
 	private: System::Void timeLimitComboBox_SelectedIndexChanged(System::Object^  sender, System::EventArgs^  e);

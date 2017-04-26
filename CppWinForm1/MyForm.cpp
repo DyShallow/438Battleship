@@ -48,6 +48,9 @@ std::string player1PCPath;
 std::string player2PCPath;
 
 std::atomic<bool> stopTiming = false;
+std::atomic<bool> exeP2 = false;
+std::atomic<bool> exeP1 = false;
+std::atomic<bool> executing = false;
 
 
 // function declarations
@@ -137,76 +140,24 @@ void update(Control^ control, int x, int y, int player) {
 	if (x < player1Board->dimension && y < player1Board->dimension) {
 		if (player == 1) {
 			// check for legality
-			if (checkMoveLegality(x,y, player1Board) == false) illegalMove(1);
-			turnString = "Player 1's turn";
-			player1Board->getSpace(x, y)->revealed = true;
-			if (player1Board->getSpace(x, y)->shipPresent) {
+			if (checkMoveLegality(x,y, player2Board) == false) illegalMove(1);
+			turnString = "Player 2's turn";
+			player2Board->getSpace(x, y)->revealed = true;
+			if (player2Board->getSpace(x, y)->shipPresent) {
 				// hit
 				
 					// display hit // handled inside if(shipremainingHP)
 				
 				// handle hit
 					// decrement ship hp
-				int shipRemainingHP = player1Board->getSpace(x, y)->ship->hit(x, y); // returns remaining hp
+				int shipRemainingHP = player2Board->getSpace(x, y)->ship->hit(x, y); // returns remaining hp
 					// decrement player hp
-				player1HP = player1HP - 1;
+				player2HP = player2HP - 1;
 				
 				//array<Control ^, 1>^ player1HPLabelarr = control->Parent->Parent->player1HPLabel->Text = "Total Ship HP Remaining:  " + player1HP;
 				//Label ^ player1HPLabel = dynamic_cast<Label^>(player1HPLabelarr[0]);
 				//player1HPLabel->Text = 
 					// check for sunk
-				if (shipRemainingHP == 0) { // sunk
-					control->BackColor = System::Drawing::Color::Black;
-					// convert managed string to std::string
-					msclr::interop::marshal_context context;
-					std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Hit and sunk!");
-					player2LastMove = standardString;
-					player2MoveCode = 3;
-				}
-				else {
-					control->BackColor = System::Drawing::Color::Red;
-					// convert managed string to std::string
-					msclr::interop::marshal_context context;
-					std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Hit!");
-					player2LastMove = standardString;
-					player2MoveCode = 2;
-				}
-				if (player1HP == 0) {
-					//MessageBox::Show("Player 2 wins!");
-					endGame(2);
-						}
-			}
-			else {
-				// miss
-				control->BackColor = System::Drawing::Color::White;
-				// display miss
-				// convert managed string to std::string
-				msclr::interop::marshal_context context;
-				std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Miss!");
-				player2LastMove = standardString;
-				player2MoveCode = 1;
-			}
-		}
-		else {
-			// check for legality
-			if (checkMoveLegality(x, y, player2Board) == false) illegalMove(2);
-			turnString = "Player 2's turn";
-			player2Board->getSpace(x, y)->revealed = true;
-			if (player2Board->getSpace(x, y)->shipPresent) {
-				// hit
-
-				// display hit // handled inside if(shipremainingHP)
-
-				// handle hit
-				// decrement ship hp
-				int shipRemainingHP = player2Board->getSpace(x, y)->ship->hit(x, y); // returns remaining hp
-																					 // decrement player hp
-				player2HP = player2HP - 1;
-
-				//array<Control ^, 1>^ player1HPLabelarr = control->Parent->Parent->player1HPLabel->Text = "Total Ship HP Remaining:  " + player1HP;
-				//Label ^ player1HPLabel = dynamic_cast<Label^>(player1HPLabelarr[0]);
-				//player1HPLabel->Text = 
-				// check for sunk
 				if (shipRemainingHP == 0) { // sunk
 					control->BackColor = System::Drawing::Color::Black;
 					// convert managed string to std::string
@@ -224,8 +175,60 @@ void update(Control^ control, int x, int y, int player) {
 					player1MoveCode = 2;
 				}
 				if (player2HP == 0) {
-					//MessageBox::Show("Player 1 wins!");
+					//MessageBox::Show("Player 2 wins!");
 					endGame(1);
+						}
+			}
+			else {
+				// miss
+				control->BackColor = System::Drawing::Color::White;
+				// display miss
+				// convert managed string to std::string
+				msclr::interop::marshal_context context;
+				std::string standardString = context.marshal_as<std::string>("Player 1's last move: " + x + "," + y + ". Miss!");
+				player1LastMove = standardString;
+				player1MoveCode = 1;
+			}
+		}
+		else {
+			// check for legality
+			if (checkMoveLegality(x, y, player1Board) == false) illegalMove(2);
+			turnString = "Player 1's turn";
+			player1Board->getSpace(x, y)->revealed = true;
+			if (player1Board->getSpace(x, y)->shipPresent) {
+				// hit
+
+				// display hit // handled inside if(shipremainingHP)
+
+				// handle hit
+				// decrement ship hp
+				int shipRemainingHP = player1Board->getSpace(x, y)->ship->hit(x, y); // returns remaining hp
+																					 // decrement player hp
+				player1HP = player1HP - 1;
+
+				//array<Control ^, 1>^ player1HPLabelarr = control->Parent->Parent->player1HPLabel->Text = "Total Ship HP Remaining:  " + player1HP;
+				//Label ^ player1HPLabel = dynamic_cast<Label^>(player1HPLabelarr[0]);
+				//player1HPLabel->Text = 
+				// check for sunk
+				if (shipRemainingHP == 0) { // sunk
+					control->BackColor = System::Drawing::Color::Black;
+					// convert managed string to std::string
+					msclr::interop::marshal_context context;
+					std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Hit and sunk!");
+					player2LastMove = standardString;
+					player2MoveCode = 3;
+				}
+				else {
+					control->BackColor = System::Drawing::Color::Red;
+					// convert managed string to std::string
+					msclr::interop::marshal_context context;
+					std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Hit!");
+					player2LastMove = standardString;
+					player2MoveCode = 2;
+				}
+				if (player1HP == 0) {
+					//MessageBox::Show("Player 1 wins!");
+					endGame(2);
 				}
 			}
 			else {
@@ -235,8 +238,8 @@ void update(Control^ control, int x, int y, int player) {
 				// convert managed string to std::string
 				msclr::interop::marshal_context context;
 				std::string standardString = context.marshal_as<std::string>("Player 2's last move: " + x + "," + y + ". Miss!");
-				player1LastMove = standardString;
-				player1MoveCode = 1;
+				player2LastMove = standardString;
+				player2MoveCode = 1;
 			}
 		}
 		
@@ -283,6 +286,8 @@ void initialize() {
 	player1HP = player1Board->totalHP;
 	player2HP = player2Board->totalHP;
 
+	turnString = "Player 1's turn";
+
 }
 
 void play(Board b1, Board b2, Ship player1Ships[], Ship player2Ships[]) {
@@ -324,6 +329,7 @@ void play(Board b1, Board b2, Ship player1Ships[], Ship player2Ships[]) {
 
 // player, mode (1 == place, 2 == play)
 void callEXE(int player, int mode) {
+	//MessageBox::Show("callEXE called, player: " + player + " mode: " + mode);
 	if (player == 1) {
 		// spawn thread
 		
@@ -335,7 +341,7 @@ void callEXE(int player, int mode) {
 			exeThread->Start(data);
 
 			System::Threading::Thread^ timerThread = gcnew
-				System::Threading::Thread(gcnew System::Threading::ParameterizedThreadStart(runExe));
+				System::Threading::Thread(gcnew System::Threading::ParameterizedThreadStart(timeLimiter));
 			array<int^, 1>^ data2 = gcnew array<int^, 1>(2) { timeLimit, player };
 			timerThread->Start(data2);
 
@@ -355,6 +361,33 @@ void callEXE(int player, int mode) {
 		}
 
 		
+	}
+	else {
+		if (mode == 2) {
+			System::Threading::Thread^ exeThread = gcnew
+				System::Threading::Thread(gcnew System::Threading::ParameterizedThreadStart(runExe));
+			array<String^, 1>^ data = gcnew array<String^, 1>(3) { gcnew String(player2PCPath.c_str()), player.ToString(), mode.ToString() };
+			exeThread->Start(data);
+
+			System::Threading::Thread^ timerThread = gcnew
+				System::Threading::Thread(gcnew System::Threading::ParameterizedThreadStart(timeLimiter));
+			array<int^, 1>^ data2 = gcnew array<int^, 1>(2) { timeLimit, player };
+			timerThread->Start(data2);
+
+			//std::thread exe(runExe, player1PCPath, player, mode);
+			//std::thread timer(timeLimiter, timeLimit);
+			//// if mode == 2, time limit applies
+			exeThread->Join();
+			stopTiming = true;
+			timerThread->Join();
+		}
+		else {
+			System::Threading::Thread^ exeThread = gcnew
+				System::Threading::Thread(gcnew System::Threading::ParameterizedThreadStart(runExe));
+			array<String^, 1>^ data3 = gcnew array<String^, 1>(3) { gcnew String(player2PCPath.c_str()), player.ToString(), mode.ToString() };
+			exeThread->Start(data3);
+			exeThread->Join();
+		}
 	}
 }
 
@@ -523,7 +556,7 @@ void getMove(int* x, int* y, int player) {
 	std::ifstream myfile(standardString);
 	if (myfile.is_open())
 	{
-		int i = 0;
+		
 		while (getline(myfile, line))
 		{
 			*x = getXFromCoordString(gcnew String(line.c_str()));
@@ -664,7 +697,7 @@ System::Void CppWinForm1::MyForm::player1Button_Click(System::Object ^ sender, S
 		player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
 		player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
 		whoseTurnLabel->Text = gcnew String(turnString.c_str());
-		human1MadeMove = true;
+		human2MadeMove = true;
 		
 	}
 }
@@ -683,7 +716,7 @@ System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, S
 	player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
 	player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
 	whoseTurnLabel ->Text = gcnew String(turnString.c_str());
-	human2MadeMove = true;
+	human1MadeMove = true;
 }
 
 System::Void CppWinForm1::MyForm::player1HumanButton_Click(System::Object ^ sender, System::EventArgs ^ e)
@@ -796,12 +829,125 @@ System::Void CppWinForm1::MyForm::showShipsCheckbox_CheckedChanged(System::Objec
 	if (senderControl->Checked == true) showShips = true;
 	else showShips = false;
 }
-
+//void CppWinForm1::MyForm::player1Turn() {
+//	int* x = new int();
+//	int* y = new int();
+//	std::string boardString;
+//
+//	// player1 turn
+//	if (player1isHuman == false) {
+//		msclr::interop::marshal_context context;
+//		std::string standardString = context.marshal_as<std::string>(player2Board->dimension + "\n");
+//		boardString = standardString;
+//		for (int i = 0; i < player2Board->dimension; i++)
+//		{
+//			for (int j = 0; j < player2Board->dimension; j++)
+//			{
+//				if (player2Buttons[i, j]->BackColor == System::Drawing::Color::SkyBlue) {
+//					boardString = boardString + "0";
+//				}
+//				else if (player2Buttons[i, j]->BackColor == System::Drawing::Color::White) {
+//					boardString = boardString + "1";
+//				}
+//				else if (player2Buttons[i, j]->BackColor == System::Drawing::Color::Red) {
+//					boardString = boardString + "2";
+//				}
+//				if (player2Buttons[i, j]->BackColor == System::Drawing::Color::Black) {
+//					boardString = boardString + "3";
+//				}
+//				if (j == player2Board->dimension - 1) {
+//					boardString = boardString + " ";
+//				}
+//
+//			}
+//			boardString = boardString + "\n";
+//		}
+//
+//		// write to file
+//		std::ofstream board;
+//		board.open("board.txt");
+//		board << boardString;
+//		board.close();
+//
+//		callEXE(1, 2);
+//
+//		getMove(x, y, 1);
+//		buttonClicked(player2Buttons[*x, *y], *x, *y, 1);
+//	}
+//	else {
+//		while (human1MadeMove == false) {
+//			Sleep(100);
+//		}
+//		human1MadeMove = false;
+//	}
+//	executing = false;
+//	exeP2 = true;
+//}
+//
+//	void CppWinForm1::MyForm::player2Turn() {
+//		int* x = new int();
+//		int* y = new int();
+//		std::string boardString;
+//
+//
+//		if (player2isHuman == false) {
+//			msclr::interop::marshal_context context;
+//			std::string standardString = context.marshal_as<std::string>(player2Board->dimension + "\n");
+//			boardString = standardString;
+//			for (int i = 0; i < player2Board->dimension; i++)
+//			{
+//				for (int j = 0; j < player2Board->dimension; j++)
+//				{
+//					if (player1Buttons[i, j]->BackColor == System::Drawing::Color::SkyBlue) {
+//						boardString = boardString + "0";
+//					}
+//					else if (player1Buttons[i, j]->BackColor == System::Drawing::Color::White) {
+//						boardString = boardString + "1";
+//					}
+//					else if (player1Buttons[i, j]->BackColor == System::Drawing::Color::Red) {
+//						boardString = boardString + "2";
+//					}
+//					if (player1Buttons[i, j]->BackColor == System::Drawing::Color::Black) {
+//						boardString = boardString + "3";
+//					}
+//					if (j == player1Board->dimension - 1) {
+//						boardString = boardString + " ";
+//					}
+//
+//				}
+//				boardString = boardString + "\n";
+//			}
+//
+//			// write to file
+//			std::ofstream board;
+//			board.open("board.txt");
+//			board << boardString;
+//			board.close();
+//
+//			callEXE(2, 2);
+//
+//			getMove(x, y, 2);
+//			buttonClicked(player1Buttons[*x, *y], *x, *y, 2);
+//
+//			player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+//			player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+//			whoseTurnLabel->Text = gcnew String(turnString.c_str());
+//			this->Update();
+//		}
+//		else {
+//			while (human2MadeMove == false) {
+//				Sleep(100);
+//			}
+//			human1MadeMove = false;
+//		}
+//		executing = false;
+//		exeP1 = true;
+//	}
 void CppWinForm1::MyForm::loopThroughTurns() {
-	int* x;
-	int* y;
+	int* x = new int();
+	int* y = new int();
 	std::string boardString;
-	while (endgame == false) {
+	//while (endgame == false) {
 		// write board
 
 
@@ -810,7 +956,9 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 
 		// player1 turn
 		if (player1isHuman == false) {
-			callEXE(1, 2);
+			msclr::interop::marshal_context context;
+			std::string standardString = context.marshal_as<std::string>(player2Board->dimension + "\n");
+			boardString = standardString;
 			for (int i = 0; i < player2Board->dimension; i++)
 			{
 				for (int j = 0; j < player2Board->dimension; j++)
@@ -841,13 +989,15 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 			board << boardString;
 			board.close();
 
+			callEXE(1, 2);
+
 			getMove(x, y, 1);
 			buttonClicked(player2Buttons[*x, *y], *x, *y, 1);
 
 			player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
-			player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
-			whoseTurnLabel->Text = gcnew String(turnString.c_str());
-			this->Update();
+			//player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
+			//whoseTurnLabel->Text = gcnew String(turnString.c_str());
+			//this->Update();
 		}
 		else {
 			while (human1MadeMove == false) {
@@ -863,7 +1013,9 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 
 
 			if (player2isHuman == false) {
-				callEXE(2, 2);
+				msclr::interop::marshal_context context;
+				std::string standardString = context.marshal_as<std::string>(player2Board->dimension + "\n");
+				boardString = standardString;
 				for (int i = 0; i < player2Board->dimension; i++)
 				{
 					for (int j = 0; j < player2Board->dimension; j++)
@@ -894,13 +1046,15 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 				board << boardString;
 				board.close();
 
+				callEXE(2, 2);
+
 				getMove(x, y, 2);
 				buttonClicked(player1Buttons[*x, *y], *x, *y, 2);
 
 				player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
-				player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
-				whoseTurnLabel->Text = gcnew String(turnString.c_str());
-				this->Update();
+				//player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+				//whoseTurnLabel->Text = gcnew String(turnString.c_str());
+				//this->Update();
 			}
 			else {
 				while (human2MadeMove == false) {
@@ -909,17 +1063,67 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 				human1MadeMove = false;
 			}
 		}
-	}
+	//}
 }
 
 // play button clicked when both players are non-human
 System::Void CppWinForm1::MyForm::playButton_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
-	// spin off thread to loop
-	System::Threading::Thread^ playThread = gcnew
-		System::Threading::Thread(gcnew System::Threading::ThreadStart(this,&CppWinForm1::MyForm::loopThroughTurns));
-	
-	playThread->Start();
+	System::Threading::Thread^ playThread1 = gcnew
+					System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::loopThroughTurns));
+
+				playThread1->Start();
+
+				player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
+				player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
+				whoseTurnLabel->Text = gcnew String(turnString.c_str());
+				player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+				player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+				whoseTurnLabel->Text = gcnew String(turnString.c_str());
+
+
+				this->Update();
+				// workaround: only plays one turn;
+
+
+
+	//// spin off thread to loop
+	//exeP1 = true;
+	//exeP2 = false;
+	//executing = false;
+	//while (endgame == false) {
+	//	if (executing == false) {
+	//		if (exeP1) {
+	//			executing = true;
+	//			exeP1 = false;
+
+	//		System::Threading::Thread^ playThread1 = gcnew
+	//			System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::player1Turn));
+
+	//		player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
+	//		player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
+	//		whoseTurnLabel->Text = gcnew String(turnString.c_str());
+	//		this->Update();
+
+	//		playThread1->Start();
+	//	}
+	//		if(exeP2){
+	//			if (endgame == false) {
+	//				executing = true;
+	//				exeP2 = false;
+	//				System::Threading::Thread^ playThread2 = gcnew
+	//					System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::player2Turn));
+
+	//				player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+	//				player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+	//				whoseTurnLabel->Text = gcnew String(turnString.c_str());
+	//				this->Update();
+
+	//				playThread2->Start();
+	//			}
+	//	}
+	//}
+	//}
 }
 
 System::Void CppWinForm1::MyForm::timeLimitComboBox_SelectedIndexChanged(System::Object ^ sender, System::EventArgs ^ e)
