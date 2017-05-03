@@ -873,6 +873,13 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 	std::cin >> numShips;
 	out << boardSize << std::endl;
 	out << numShips << std::endl;
+
+	for (int a = 0; a < numShips; a++) {
+		std::cout << "What length would you like this ship to be?" << std::endl;
+		std::cin >> length;
+		lengths.push_back(length);
+	}
+
 	bool p1 = false;
 	if (player1isHuman) {
 		std::ofstream placement;
@@ -881,10 +888,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 		for (int i = 0; i < numShips; i++) {
 
 			v = true;
-			p1 = true;
-			std::cout << "What length would you like this ship to be?" << std::endl;
-			std::cin >> length;
-			lengths.push_back(length);
+			length = lengths[i];
 			out << "l" << length << "w1" << std::endl;
 			std::cout << "Enter the x coordinate for the ship: " << std::endl;
 			std::cin >> x;
@@ -942,6 +946,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 		placement.close();
 		system("cls");
 	}
+
 	if (player2isHuman) {
 		std::ofstream placement;
 		placement.open("player2ships.txt");
@@ -952,14 +957,8 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 			v = true;
 			//std::cout << "What length would you like this ship to be?" << std::endl;
 			//std::cin >> length;
-			if (p1) {
-				std::cout << "What length would you like this ship to be?" << std::endl;
-				std::cin >> length;
-				lengths.push_back(length);
-			}
-			else {
-				length = lengths[i];
-			}
+			length = lengths[i];
+			
 			std::cout << "length of ship: " << length << std::endl;
 			//out << "l" << length << "w1" << std::endl;
 			std::cout << "Enter the x coordinate for the ship: " << std::endl;
