@@ -878,6 +878,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 		std::cout << "What length would you like this ship to be?" << std::endl;
 		std::cin >> length;
 		lengths.push_back(length);
+		out << "l" << length << "w1" << std::endl;
 	}
 
 	bool p1 = false;
@@ -889,7 +890,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 
 			v = true;
 			length = lengths[i];
-			out << "l" << length << "w1" << std::endl;
+			//out << "l" << length << "w1" << std::endl;
 			std::cout << "Enter the x coordinate for the ship: " << std::endl;
 			std::cin >> x;
 			while (x >= boardSize || x < 0) {
