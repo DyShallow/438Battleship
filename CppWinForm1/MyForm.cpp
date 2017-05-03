@@ -705,13 +705,14 @@ System::Void CppWinForm1::MyForm::player1Button_Click(System::Object ^ sender, S
 		player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
 		whoseTurnLabel->Text = gcnew String(turnString.c_str());
 		human2MadeMove = true;
-
-		for (int i = 0; i < player1Board->dimension; i++)
-		{
-			for (int j = 0; j < player1Board->dimension; j++)
+		if (player1isHuman && player2isHuman) {
+			for (int i = 0; i < player1Board->dimension; i++)
 			{
-				player1Buttons[i, j]->Enabled = false;
-				player2Buttons[i, j]->Enabled = true;
+				for (int j = 0; j < player1Board->dimension; j++)
+				{
+					player1Buttons[i, j]->Enabled = false;
+					player2Buttons[i, j]->Enabled = true;
+				}
 			}
 		}
 
@@ -752,12 +753,14 @@ System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, S
 	whoseTurnLabel ->Text = gcnew String(turnString.c_str());
 	human1MadeMove = true;
 
-	for (int i = 0; i < player1Board->dimension; i++)
-	{
-		for (int j = 0; j < player1Board->dimension; j++)
+	if (player1isHuman && player2isHuman) {
+		for (int i = 0; i < player1Board->dimension; i++)
 		{
-			player2Buttons[i, j]->Enabled = false;
-			player1Buttons[i, j]->Enabled = true;
+			for (int j = 0; j < player1Board->dimension; j++)
+			{
+				player1Buttons[i, j]->Enabled = false;
+				player2Buttons[i, j]->Enabled = true;
+			}
 		}
 	}
 
@@ -1038,6 +1041,23 @@ System::Void CppWinForm1::MyForm::placeButton_Click(System::Object ^ sender, Sys
 
 		}
 	}
+
+	
+		for (int i = 0; i < player1Board->dimension; i++)
+		{
+			for (int j = 0; j < player1Board->dimension; j++)
+			{
+				if (player1isHuman == false) {
+					player2Buttons[i, j]->Enabled = false;
+				}
+				if (player2isHuman == false) {
+					player1Buttons[i, j]->Enabled = false;
+				}
+			}
+		}
+	
+
+
 	player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
 	player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
 	whoseTurnLabel->Text = L"Player 1's Turn";
