@@ -801,12 +801,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 	std::ofstream out;
 	
 	out.open("settings.txt");
-<<<<<<< HEAD
-	placement.open("player2ships.txt");
 
-=======
-	
->>>>>>> 90a7764cf0ecc1455d539da2cfd313e64bca9915
 	std::cout << "Enter a board size: " << std::endl;
 	std::cin >> boardSize;
 	std::cout << "How many ships would you like?" << std::endl;
