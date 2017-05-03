@@ -142,7 +142,7 @@ int getWFromString(String^ s) {
 }
 
 
-// update button appearance, player== clickee
+// update button appearance, player== clicker
 void update(Control^ control, int x, int y, int player) {
 	if (x < player1Board->dimension && y < player1Board->dimension) {
 		if (player == 1) {
@@ -758,8 +758,8 @@ System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, S
 		{
 			for (int j = 0; j < player1Board->dimension; j++)
 			{
-				player1Buttons[i, j]->Enabled = false;
-				player2Buttons[i, j]->Enabled = true;
+				player2Buttons[i, j]->Enabled = false;
+				player1Buttons[i, j]->Enabled = true;
 			}
 		}
 	}
@@ -1232,9 +1232,9 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 			callEXE(1, 2);
 
 			getMove(x, y, 1);
-			buttonClicked(player2Buttons[*x, *y], *x, *y, 1);
+			buttonClicked(player2Buttons[*x, *y], *x, *y, 2);
 
-			player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
+			//player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
 			//player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
 			//whoseTurnLabel->Text = gcnew String(turnString.c_str());
 			//this->Update();
@@ -1289,9 +1289,9 @@ void CppWinForm1::MyForm::loopThroughTurns() {
 				callEXE(2, 2);
 
 				getMove(x, y, 2);
-				buttonClicked(player1Buttons[*x, *y], *x, *y, 2);
+				buttonClicked(player1Buttons[*x, *y], *x, *y, 1);
 
-				player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+				//player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
 				//player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
 				//whoseTurnLabel->Text = gcnew String(turnString.c_str());
 				//this->Update();
@@ -1313,6 +1313,7 @@ System::Void CppWinForm1::MyForm::playButton_Click(System::Object ^ sender, Syst
 					System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::loopThroughTurns));
 
 				playThread1->Start();
+				playThread1->Join();
 
 				player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
 				player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
