@@ -405,7 +405,7 @@ namespace CppWinForm1 {
 			this->resetButton->Name = L"resetButton";
 			this->resetButton->Size = System::Drawing::Size(87, 29);
 			this->resetButton->TabIndex = 0;
-			this->resetButton->Text = L"Reset";
+			this->resetButton->Text = L"Setup";
 			this->resetButton->UseVisualStyleBackColor = true;
 			this->resetButton->Click += gcnew System::EventHandler(this, &MyForm::resetButton_Click);
 			// 
