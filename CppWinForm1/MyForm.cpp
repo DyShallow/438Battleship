@@ -796,75 +796,158 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 	int numShips;
 	int length;
 	int x, y, o;
+	std::vector<int> lengths;
 	bool v = true;
 	std::ofstream out;
-	std::ofstream placement;
+	
 	out.open("settings.txt");
+<<<<<<< HEAD
 	placement.open("player2ships.txt");
 
+=======
+	
+>>>>>>> 90a7764cf0ecc1455d539da2cfd313e64bca9915
 	std::cout << "Enter a board size: " << std::endl;
 	std::cin >> boardSize;
 	std::cout << "How many ships would you like?" << std::endl;
 	std::cin >> numShips;
 	out << boardSize << std::endl;
 	out << numShips << std::endl;
-	for (int i = 0; i < numShips; i++) {
-		v = true;
-		std::cout << "What length would you like this ship to be?" << std::endl;
-		std::cin >> length;
-		out << "l" << length << "w1" << std::endl;
-		std::cout << "Enter the x coordinate for the ship: " << std::endl;
-		std::cin >> x;
-		while (x >= boardSize || x < 0) {
-			std::cout << "invalid x.  Please enter a new x: " << std::endl;
+	if (player1isHuman) {
+		std::ofstream placement;
+		placement.open("player1ships.txt");
+		std::cout << "Player1:" << std::endl;
+		for (int i = 0; i < numShips; i++) {
+
+			v = true;
+			std::cout << "What length would you like this ship to be?" << std::endl;
+			std::cin >> length;
+			lengths.push_back(length);
+			out << "l" << length << "w1" << std::endl;
+			std::cout << "Enter the x coordinate for the ship: " << std::endl;
 			std::cin >> x;
-		}
-		std::cout << "Enter the y coordinate for the ship: " << std::endl;
-		std::cin >> y;
-		while (y >= boardSize || y < 0) {
-			std::cout << "invalid y.  Please enter a new y: " << std::endl;
+			while (x >= boardSize || x < 0) {
+				std::cout << "invalid x.  Please enter a new x: " << std::endl;
+				std::cin >> x;
+			}
+			std::cout << "Enter the y coordinate for the ship: " << std::endl;
 			std::cin >> y;
+			while (y >= boardSize || y < 0) {
+				std::cout << "invalid y.  Please enter a new y: " << std::endl;
+				std::cin >> y;
+			}
+			while (v) {
+				std::cout << "Enter the orientation for the ship (1 = west, 2 = north, 3 = east, 4 = south)" << std::endl;
+				std::cin >> o;
+				if (o == 1) {
+					if (x - length >= 0) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 2) {
+					if (y - length >= 0) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 3) {
+					if (x + length < boardSize) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 4) {
+					if (y + length < boardSize) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else {
+					std::cout << "Invalid orientation.  Please enter a new orientation." << std::endl;
+				}
+			}
+			placement << "x" << x << "y" << y << std::endl << o << std::endl;
 		}
-		while (v) {
-			std::cout << "Enter the orientation for the ship (1 = west, 2 = north, 3 = east, 4 = south)" << std::endl;
-			std::cin >> o;
-			if (o == 1) {
-				if (x - length >= 0) {
-					v = false;
+		placement.close();
+		system("cls");
+	}
+	if (player2isHuman) {
+		std::ofstream placement;
+		placement.open("player2ships.txt");
+		std::cout << "board size is " << boardSize << std::endl;
+		std::cout << "Player 2:" << std::endl;
+		for (int i = 0; i < numShips; i++) {
+
+			v = true;
+			//std::cout << "What length would you like this ship to be?" << std::endl;
+			//std::cin >> length;
+			length = lengths[i];
+			std::cout << "length of ship: " << length << std::endl;
+			//out << "l" << length << "w1" << std::endl;
+			std::cout << "Enter the x coordinate for the ship: " << std::endl;
+			std::cin >> x;
+			while (x >= boardSize || x < 0) {
+				std::cout << "invalid x.  Please enter a new x: " << std::endl;
+				std::cin >> x;
+			}
+			std::cout << "Enter the y coordinate for the ship: " << std::endl;
+			std::cin >> y;
+			while (y >= boardSize || y < 0) {
+				std::cout << "invalid y.  Please enter a new y: " << std::endl;
+				std::cin >> y;
+			}
+			while (v) {
+				std::cout << "Enter the orientation for the ship (1 = west, 2 = north, 3 = east, 4 = south)" << std::endl;
+				std::cin >> o;
+				if (o == 1) {
+					if (x - length >= 0) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 2) {
+					if (y - length >= 0) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 3) {
+					if (x + length < boardSize) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
+				}
+				else if (o == 4) {
+					if (y + length < boardSize) {
+						v = false;
+					}
+					else {
+						std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					}
 				}
 				else {
-					std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
+					std::cout << "Invalid orientation.  Please enter a new orientation." << std::endl;
 				}
 			}
-			else if (o == 2) {
-				if (y - length >= 0) {
-					v = false;
-				}
-				else {
-					std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
-				}
-			}
-			else if (o == 3) {
-				if (x + length < boardSize) {
-					v = false;
-				}
-				else {
-					std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
-				}
-			}
-			else if (o == 4) {
-				if (y + length < boardSize) {
-					v = false;
-				}
-				else {
-					std::cout << "invalid orientation.  Please enter a new orientation: " << std::endl;
-				}
-			}
-			else {
-				std::cout << "Invalid orientation.  Please enter a new orientation." << std::endl;
-			}
+			placement << "x" << x << "y" << y << std::endl << o << std::endl;
 		}
-		placement << "x" << x << "y" << y << std::endl << o << std::endl;
+		placement.close();
+		system("cls");
 	}
 	out.close();
 	return System::Void();
