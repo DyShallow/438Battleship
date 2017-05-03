@@ -890,6 +890,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 
 			v = true;
 			length = lengths[i];
+			std::cout << "Length of ship: " << length << std::endl;
 			//out << "l" << length << "w1" << std::endl;
 			std::cout << "Enter the x coordinate for the ship: " << std::endl;
 			std::cin >> x;
