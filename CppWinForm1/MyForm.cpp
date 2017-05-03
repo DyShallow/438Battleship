@@ -801,6 +801,7 @@ System::Void CppWinForm1::MyForm::resetButton_Click(System::Object ^ sender, Sys
 	std::ofstream placement;
 	out.open("settings.txt");
 	placement.open("player2ships.txt");
+
 	std::cout << "Enter a board size: " << std::endl;
 	std::cin >> boardSize;
 	std::cout << "How many ships would you like?" << std::endl;
@@ -882,10 +883,15 @@ System::Void CppWinForm1::MyForm::placeButton_Click(System::Object ^ sender, Sys
 			if (i >= gameDim || j >= gameDim) {// disable out of bounds buttons
 				player1Buttons[i, j]->Enabled = false;
 				player2Buttons[i, j]->Enabled = false;
+
+				player1Buttons[i, j]->Visible = false;
+				player2Buttons[i, j]->Visible = false;
 			}
 			else { // enable in bounds buttons
 				player1Buttons[i, j]->Enabled = true;
 				player2Buttons[i, j]->Enabled = true;
+				player1Buttons[i, j]->Visible = true;
+				player2Buttons[i, j]->Visible = true;
 				player1Buttons[i, j]->BackColor = System::Drawing::Color::SkyBlue;
 				player2Buttons[i, j]->BackColor = System::Drawing::Color::SkyBlue;
 			}
