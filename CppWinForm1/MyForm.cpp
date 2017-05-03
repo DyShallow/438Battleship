@@ -58,7 +58,7 @@ void update(Control^ control, int x, int y, int player); // does a move
 void illegalMove(int player); // player made an illegal move
 void endGame(int winner); // player winner wins game
 bool checkMoveLegality(int x,int y, Board* player1Board); // checks legality of move, true if legal, false if illegal
-void buttonClicked(Control^ control, int x, int y, int player); // does actions after a move is manually input
+void buttonClicked(Control^ control, int x, int y, int clickee); // does actions after a move is manually input
 array<String^,1>^ getSettings(); // reads in settings from settings.txt
 void shipsFromFile(int player, Ship* ships[], array<String^,1>^ settings); // reads ships in from playerXships.txt
 int getLFromString(String^ s);
@@ -87,8 +87,8 @@ void Main(array<String^, 1>^ args)
 
 }
 
-void buttonClicked(Control^ control, int x, int y, int player) {
-	String^ managedString = "Player " + player + " Button at " + x + ", " + y + " pressed";
+void buttonClicked(Control^ control, int x, int y, int clickee) {
+	String^ managedString = "Player " + clickee + " Button at " + x + ", " + y + " pressed";
 
 	// convert managed string to std::string
 	//msclr::interop::marshal_context context;
@@ -99,6 +99,13 @@ void buttonClicked(Control^ control, int x, int y, int player) {
 	//log.open("log.txt");
 	//log << standardString;
 	//log.close();
+	int player;
+	if (clickee == 1) {
+		player = 2;
+	}
+	else {
+		player = 1;
+	}
 
 	update(control, x, y, player);
 
@@ -135,7 +142,7 @@ int getWFromString(String^ s) {
 }
 
 
-// update button appearance
+// update button appearance, player== clickee
 void update(Control^ control, int x, int y, int player) {
 	if (x < player1Board->dimension && y < player1Board->dimension) {
 		if (player == 1) {
@@ -683,7 +690,7 @@ void endGame(int winner) {
 
 System::Void CppWinForm1::MyForm::player1Button_Click(System::Object ^ sender, System::EventArgs ^ e)
 {
-	{
+	
 		//MessageBox::Show("You clicked on player 1's buttons!");
 		Control^ senderControl = dynamic_cast<Control^>(sender);
 		String^ coordString;
@@ -698,8 +705,35 @@ System::Void CppWinForm1::MyForm::player1Button_Click(System::Object ^ sender, S
 		player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
 		whoseTurnLabel->Text = gcnew String(turnString.c_str());
 		human2MadeMove = true;
-		
-	}
+
+		for (int i = 0; i < player1Board->dimension; i++)
+		{
+			for (int j = 0; j < player1Board->dimension; j++)
+			{
+				player1Buttons[i, j]->Enabled = false;
+				player2Buttons[i, j]->Enabled = true;
+			}
+		}
+
+		this->Update();
+
+		// execute 'play' button code
+
+		System::Threading::Thread^ playThread1 = gcnew
+			System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::loopThroughTurns));
+
+		playThread1->Start();
+
+		player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
+		player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
+		whoseTurnLabel->Text = gcnew String(turnString.c_str());
+		player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+		player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+		whoseTurnLabel->Text = gcnew String(turnString.c_str());
+
+
+		this->Update();
+	
 }
 
 System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, System::EventArgs ^ e)
@@ -717,6 +751,34 @@ System::Void CppWinForm1::MyForm::player2Button_Click(System::Object ^ sender, S
 	player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
 	whoseTurnLabel ->Text = gcnew String(turnString.c_str());
 	human1MadeMove = true;
+
+	for (int i = 0; i < player1Board->dimension; i++)
+	{
+		for (int j = 0; j < player1Board->dimension; j++)
+		{
+			player2Buttons[i, j]->Enabled = false;
+			player1Buttons[i, j]->Enabled = true;
+		}
+	}
+
+	this->Update();
+
+	// execute 'play' button code
+
+	System::Threading::Thread^ playThread1 = gcnew
+		System::Threading::Thread(gcnew System::Threading::ThreadStart(this, &CppWinForm1::MyForm::loopThroughTurns));
+
+	playThread1->Start();
+
+	player2HPLabel->Text = L"Total Ship HP Remaining:  " + player2HP;
+	player1LastMoveLabel->Text = gcnew String(player1LastMove.c_str());
+	whoseTurnLabel->Text = gcnew String(turnString.c_str());
+	player1HPLabel->Text = L"Total Ship HP Remaining:  " + player1HP;
+	player2LastMoveLabel->Text = gcnew String(player2LastMove.c_str());
+	whoseTurnLabel->Text = gcnew String(turnString.c_str());
+
+
+	this->Update();
 }
 
 System::Void CppWinForm1::MyForm::player1HumanButton_Click(System::Object ^ sender, System::EventArgs ^ e)
